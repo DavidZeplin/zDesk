@@ -1,0 +1,8 @@
+# zDesk
+.DS_Store
+*.DS_Store
+.vscode/
+authentication.js
+node_modules
+notes/
+**/*-todo.md
