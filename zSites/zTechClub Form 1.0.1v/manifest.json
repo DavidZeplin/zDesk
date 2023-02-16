@@ -1,0 +1,55 @@
+{
+  "name": "zClub Form 1.0.0v",
+  "author": "Zendesk",
+  "version": "2.0.0",
+  "api_version": 2,
+  "default_locale": "en-us",
+  "settings": [
+    {
+      "label": "Form Settings",
+      "variables": [
+        {
+          "identifier": "hidden_fields",
+          "type": "checkbox",
+          "description": "Check to hide custom form fields",
+          "label": "Hide Form Fields",
+          "value": true
+        }
+      ]
+    },
+    {
+      "label": "brand_group_label",
+      "variables": [
+        {
+          "identifier": "logo",
+          "type": "file",
+          "description": "logo_description",
+          "label": "logo_label"
+        },
+        {
+          "identifier": "favicon",
+          "type": "file",
+          "description": "favicon_description",
+          "label": "favicon_label"
+        }
+      ]
+    },
+    {
+      "label": "images_group_label",
+      "variables": [
+        {
+          "identifier": "banner",
+          "type": "file",
+          "description": "banner_description",
+          "label": "banner_label"
+        },
+        {
+          "identifier": "banner_mobile",
+          "type": "file",
+          "description": "banner_mobile_description",
+          "label": "banner_mobile_label"
+        }
+      ]
+    }
+  ]
+}

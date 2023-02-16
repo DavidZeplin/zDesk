@@ -1,0 +1,107 @@
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=1" name="viewport" />
+<meta name="robots" content="noindex, nofollow, nosnippet" />
+<script src="{{asset 'jquery.min.js'}}"></script>
+<script src="{{asset 'main.js'}}"></script>
+<script>
+    var categoryName;
+    var categoryId;
+    var sectionName;
+    var productName;
+    var formId;
+    var nativeBridge;
+    var platformKey;
+    var analyticsObj = {
+        configuration: {
+			SiteCatalyst: {},
+		}
+    };
+    const lowerEnv = 'lower';
+    const prodEnv = 'production';
+    const zTechOpsBrand = 'zTechOps';
+    const zTechClubBrand = 'zTechClub';
+    const reportSuiteTechClubLower = "ztechclubproclubdev";
+    const reportSuiteTechClubProd = "ztechclubproclub";
+    const guestType = "Customer";
+    const registeredRegistrationStatus = "Registered - Logged In";
+    const pageIdLanding = "landing";
+    const pageIdConfirmation = "confirmation";
+    const flowDashboard = "Dashboard";
+    const contentDefaultLanguage = "en";
+    const contentDefaultLocale = "US";
+    var userData;
+    var isComplimentForm;
+    var wasDirectLink;
+
+    function getParam(sParam) {
+        var url = new URL(window.location)
+        var params = url.searchParams
+        return params.get(sParam)?.replaceAll("<", "").replaceAll(">", "");
+    };
+
+
+    function extractBrandInDomain() {
+        if (window.location.hostname.indexOf("ztechops") >= 0) {
+            return zTechOpsBrand.toLowerCase();
+        } else if (window.location.hostname.indexOf("ztechclub") >= 0) {
+            return zTechClubBrand.toLowerCase();
+        }
+    }
+
+    function getBrand() {
+        return isProduction() ? extractBrandInDomain() : window.location.hostname.substring(0, 3);
+    }
+
+    function setAnalyticsContentLanguageValue(contentLang = contentDefaultLanguage) {
+        analyticsObj.contentLanguage = contentLang;
+    }
+
+    function setAnalyticsContentLocaleValue(contentLocale = contentDefaultLocale) {
+        analyticsObj.contentLocale = contentLocale;
+    }
+
+    function setAnalyticsContentId(id) {
+        analyticsObj.contentId = id;
+    }
+
+    function setAnalyticsPageVariant(id) {
+        analyticsObj.pageVariant = id;
+    }
+
+    function setAnalyticsSiteId() {
+        const brand = getBrand().toUpperCase();
+        if (brand === zTechOpsBrand) {
+            analyticsObj.site = zTechOpsBrand;
+            analyticsObj.configuration.SiteCatalyst.reportSuiteId =
+                isProduction() ? reportSuiteTechClubProd : reportSuiteTechClubLower;
+        } else if (brand === zTechOpsBrand) {
+            analyticsObj.site = zTechClubBrand;
+            analyticsObj.configuration.SiteCatalyst.reportSuiteId =
+                isProduction() ? reportSuiteTechClubProd : reportSuiteTechClubLower;
+        }
+    }
+
+    function setAnalyticsValues() {
+        setAnalyticsSiteId();
+        setAnalyticsFlowValue();
+        setAnalyticsContentLanguageValue();
+        setAnalyticsContentLocaleValue();
+
+        return analyticsObj;
+    }
+
+    function isProduction() {
+        return window.location.hostname.indexOf("sandbox") === -1;
+    }
+
+    function debugInfo() {
+        return {
+            "window.": window.personal,
+            "nativeBridge": nativeBridge,
+            "currentUrl": window.location.href,
+            "ContactUsPlugin": window.ContactUsPlugin,
+            "getPlatformKey": getPlatformKey(),
+            "document.referrer": document.referrer
+        }
+    }
+    
+</script>
