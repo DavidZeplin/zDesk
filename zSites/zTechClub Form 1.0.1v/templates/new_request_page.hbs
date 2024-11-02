@@ -31,7 +31,22 @@
 
 <script>
 	const minCharsAction = 3;
-	
+	function checkFieldUserAction(field,value){
+     value.length > minCharsAction && track(field)
+	};
+
+	$("#request_custom_fields_12454240454157,#request_custom_fields_sandbox-formId").change(function(){
+	  checkFieldUserAction("firstNameEntry", $(this).val());
+	});
+
+	$("#request_custom_fields_13306474553485, #request_custom_fields_sandbox-formId").change(function(){
+	  checkFieldUserAction("EmployeeCenterEntry", $(this).val())
+	});
+
+	$("#request_custom_fields_13306543601933, #request_custom_fields_sandbox-formId").focus(function(){
+	  checkFieldUserAction("dateRecognitionEntry",$(this).val())
+	});
+
 	var handleReturn;
 	$('body').addClass('new_request');
 	//force update the optionals
@@ -40,12 +55,12 @@
 	categoryId = getParam('categoryId');
 	categoryName = getParam('category');
 	var fieldId = getParam('fieldId');
-	var selectedTopic = getParam('topic');
+	selectedTopic = getParam('topic');
 	var tag = getParam('tag');
 	formId = getParam('ticket_form_id');
 	var fields = [];
 	var $form = $('#new_request');
-	isComplimentForm = (formId ==="13176891983373")
+	isRecognitionForm = (formId ==="13176891983373" || formId ==="sandbox-formID")
 	var isDirectLink = (categoryId === undefined);
 	function updateParams() {
 		//rebuild the form /action to contain our parameters
@@ -170,9 +185,10 @@
 		}
 
 		if (isComplimentForm) {
-			const notificationErrorMessage = `{{ 'notificationErrorMessage'}}`;
-			const dropdownDefaultMessage = `{{ 'dropdownDefaultMessage'}}`;
-			const requiredText = `{{ 'dropdownRequired'}}`;	
+			const notificationErrorMessage = `{{dc 'hc_zc_emprecog_notificationErrorMessage'}}`;
+			const dropdownDefaultMessage = `{{dc 'hc_zc_emprecog_dropdownDefaultMessage'}}`;
+			const requiredText = `{{dc 'hc_zc_emprecog_dropdownRequired'}}`;	
+			const headerTitle = "Mobile Employee Recognition";
 			$('#breadcrumb').text(headerTitle);
 			if (!userData) { connectBridge();} else { console.log("USER", userData); }
 			if (!document.referrer) { wasDirectLink = true; }
@@ -183,30 +199,47 @@
 				myDate = new Date(myDate);
 				return ((myDate.getMonth() > 8) ? (myDate.getMonth() + 1) : ('0' + (myDate.getMonth() + 1))) + '/' + ((myDate.getDate() > 9) ? myDate.getDate() : ('0' + myDate.getDate())) + '/' + myDate.getFullYear();
 			}
+
+			function handleSubmit() {
+				const pageVariant = $('.nesty-input:eq(1)').html();
+				if (pageVariant) { setAnalyticsPageVariant(pageVariant); }
+				const contentId = $('.nesty-input:eq(2)')[0].previousElementSibling.value;
+				if (contentId) { setAnalyticsContentId(contentId); }
+
+				const EmpName = $("#request_custom_fields_12454240454157, #request_custom_fields_sandbox-formID").val();
+				const EmpCenter = $("#request_custom_fields_13306474553485, #request_custom_fields_sandbox-formID").val();
+				const myDate = $(".datepicker, #request_custom_fields_13306543601933").val();
+				if (EmpName || EmpCenter || myDate) {
+					const newFieldsPageVariant = "EmpName:" + (EmpName? "Y" : "N") + ",EmpCenter:"+ (EmpCenter? "Y" : "N") + ",Date:" + (myDate ? formatDate(myDate) : "N");
+					if (newFieldsPageVariant) { setAnalyticsPageVariant(newFieldsPageVariant); }
+				}
+
+				track("submit");
+			}
 			
 			$form.on('submit', handleSubmit);
-			$('body').addClass("cast-compliment-form");
+			$('body').addClass("emp-recognition-form");
 			$('#arrow').attr('onclick', "handleReturn()");
 			$('#breadcrumb').attr('href', "javascript:handleReturn()");
-			$('#request_custom_fields_1500012085061, #request_custom_fields_1500015318022').attr('maxlength', "15");
-			$('#request_custom_fields_1500012085061, #request_custom_fields_1500015318022').attr('placeholder', "Chris");
-			$('#request_custom_fields_1900000652005, #request_custom_fields_1500015270301').attr('maxlength', "35");
-			$('#request_custom_fields_1900000652005, #request_custom_fields_1500015270301').attr('placeholder', "Orlando, FL");
+			$('#request_custom_fields_12454240454157, #request_custom_fields_sandbox-formID').attr('maxlength', "15");
+			$('#request_custom_fields_12454240454157, #request_custom_fields_sandbox-formID').attr('placeholder', "Chris");
+			$('#request_custom_fields_13306474553485, #request_custom_fields_sandbox-formID').attr('maxlength', "35");
+			$('#request_custom_fields_13306474553485, #request_custom_fields_sandbox-formID').attr('placeholder', "FL01DZ");
 			$('#request_custom_fields_1500009525922_label, #request_custom_fields_1500010467522_label').append("*");
 			$('#request_custom_fields_1900001444185_label, #request_custom_fields_1500010396161_label').append("*");
 			$('h1:first').after(`<label id='required-fields-text'>${requiredText}</label>`);
 			
 			var img = $('<img alt="Anyone creating recommendation at awesome zTechOps environment">');
-			img.attr('src', "{{dc 'hc_mdx_castcomp_form_img'}}");
+			img.attr('src', "{{dc 'hc_zc_emprecog_form_img'}}");
 			img.appendTo('#image');
 			$(".nesty-input:eq(1)").text(dropdownDefaultMessage);
 			$(".nesty-input:eq(2)").text(dropdownDefaultMessage);
-			const optionalData = `{{ 'hc_zC_recommend_optional'}}`;
+			const optionalData = `{{dc 'hc_zc_emprecog_optional'}}`;
 			if (optionalData.indexOf("Could not find the placeholder") < 0) {
-				$("div.form-field:last-of-type").before(`<div id="optional_container"><p>{{dc 'hc_zC_recommend_optional'}}</p></div>`);
+				$("div.form-field:last-of-type").before(`<div id="optional_container"><p>{{dc 'hc_zc_emprecog_optional'}}</p></div>`);
 				$("div.form-field.string.optional").appendTo("#optional_container");
 			}	
-			$("form").after(`<div id="disclaimer"><p>{{ 'hc_mdx_recommend_disclaimer'}}</p></div>`);
+			$("form").after(`<div id="disclaimer"><p>{{dc 'hc_zc_emprecog_disclaimer'}}</p></div>`);
 			$(".notification-error").text(notificationErrorMessage);
 			$(".notification-error").prepend(`<img id="notification-error-icon" src="{{asset 'alert.png'}}" alt="close window">`);
 			
@@ -224,8 +257,8 @@
 			    	$(prevSibling).html(dropdownDefaultMessage);
 				});
 			});
-			$('.category-title').html("{{dc 'hc_zC_recommend_title'}}");
-			$('#request_subject').val("Recongization of Appreciate");
+			$('.category-title').html("{{dc 'hc_zc_emprecog_title'}}");
+			$('#request_subject').val("Recognition of Appreciate");
 			$('.request_subject').hide();
 			$('#request_description').val("Person has shared appreciation about their view of experience. See ticket fields for details.");
 			$('.request_description').hide();

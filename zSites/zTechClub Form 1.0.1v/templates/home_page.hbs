@@ -74,11 +74,16 @@
 	var categories = [];
 	var categoryDataURL;
 
+	var previousUrl = document.referrer;
+	isRecongizationForm = previousUrl.indexOf("13176891983373") !== -1 || previousUrl.indexOf("15000027711") !== -1;
+	wasDirectLink = (previousUrl.indexOf("categoryId") === -1);
+
 	//When we select a topic, update the UI accordingly
 	function changeCategory(e) {
 		selectedCategory = null;
 		$('.subtopics-container').removeClass('show');
 		$('.topics--fieldset .topic').remove();
+		
 		var categoryId;
 
 		if(e) {
@@ -159,15 +164,58 @@
 		window.location = contactFormLink;
 	}
 
+	function handleDone() {
+		if (history && history.length > 2) {
+			handleCastComplimentRedirect(-2);
+		} else {
+			closeBridge();
+		}
+	}
+
 	function handleArrow() {
 		track('close');
 		handleDone();
 	}
 
 	$ (function () {
-		// for alerts lets define page type
+	// for alerts lets define page type
 		$('body').attr("page", "homepage");
 		$('body').addClass('homepage');
+		if (isComplimentForm) {
+			const thankYouMessage = `{{dc 'hc_zc_emprecog_thankyou'}}`;
+			const headerTitle = "Mobile Employee Recognition";
+
+			setAnalyticsValues();
+			track("pageConfirmation");
+			$('body').addClass("emp-recognition-form");
+			$('#arrow').attr("onclick", "handleArrow()");
+
+			var $breadcrumb = $('#breadcrumb');
+			$breadcrumb.text(headerTitle);
+			$breadcrumb.attr('href', "javascript:handleDone()");
+
+			var $doneButton = $('<input class="submit-button" name="&lid=helpCenterOverview" type="submit" value="Done">');
+			$doneButton.click(function() {
+				track("done");
+				handleDone();
+			});
+			
+			var $img = $('<img alt="We are the Awesome">');
+			$img.attr('src', "{{dc 'hc_zc_emprecog_confirmation_img'}}");
+
+			var $text = $('<p>');
+			$text.html(thankYouMessage);
+
+			$('#main').html($img);
+			$('#main').append($text);
+			$('#main').append($doneButton);
+
+			$('.submit-button-footer').remove();
+
+			setTimeout(() => {
+				$('._63983a716933a264792c2d8aeb1396b7-css').remove();
+			}, 1000);
+		}
 		
 		//Parse Category Data
 		switch (window.location.hostname) {
